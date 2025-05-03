@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Building2, Cloud, Droplet, Thermometer, Wind } from "lucide-react"
 
 export default function Home() {
   const [weather, setWeather] = useState<Weather | null>(null)
@@ -86,11 +87,36 @@ export default function Home() {
           <TableHeader>
           {!loading && weather && (
             <TableRow>
-              <TableHead>City</TableHead>
-              <TableHead>Temperature</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Humidity</TableHead>
-              <TableHead>Wind Speed</TableHead>
+              <TableHead >
+                <div className="flex items-center gap-1">
+                  <Building2 className="w-4 h-4" />
+                    City
+                </div>
+              </TableHead>
+              <TableHead >
+                <div className="flex items-center gap-1">
+                  <Thermometer className="w-4 h-4" />
+                    Temperature
+                </div>
+              </TableHead>
+              <TableHead >
+                <div className="flex items-center gap-1">
+                  <Cloud className="w-4 h-4" />
+                  Description
+                </div>
+              </TableHead>
+              <TableHead >
+                <div className="flex items-center gap-1">
+                  <Droplet className="w-4 h-4" />
+                    Humidity
+                </div>
+              </TableHead>
+              <TableHead >
+                <div className="flex items-center gap-1">
+                  <Wind className="w-4 h-4" />
+                    Wind Speed
+                </div>
+              </TableHead>
             </TableRow>
             )}
           </TableHeader>
