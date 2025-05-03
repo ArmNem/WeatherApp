@@ -1,103 +1,132 @@
-import Image from "next/image";
+"use client"
+import { Weather } from "@/models/weather"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { toast } from "sonner"
+import weatherService from "@/services/weatherService"
+import { Button } from "@/components/ui/button"
+import React, { useState } from "react"
+import axios from "axios"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [weather, setWeather] = useState<Weather | null>(null)
+  const [searchCity, setSearchCity] = useState<string| null>(null)
+  const [loading, setLoading] = useState(false)
+  const [isImperial, setIsImperial] = useState(false)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const fetch = async () => {
+    if (!searchCity) return
+
+    setLoading(true)
+    try {
+      const units = isImperial ? 'imperial' : 'metric'
+      const data = await weatherService.getWeather(searchCity, units)
+      setWeather(data)
+      toast.success("Weather loaded!")
+    } catch (err: unknown) {
+      const errorMsg = axios.isAxiosError(err) ? err.response?.data?.message || err.message : 'Error during the request'
+      toast.error(errorMsg)
+      setWeather(null)
+    } finally {
+      setLoading(false)
+      setSearchCity(null)
+    }
+  }
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchCity(event.target.value)
+  }
+  
+  const handleSwitchChange = (checked: boolean) => {
+    setIsImperial(checked)
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-start gap-12 p-8 sm:p-20">
+      <header className="text-center">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white">
+          Welcome to the Weather App
+        </h1>
+        {weather && (
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Current weather for <strong>{weather.city}</strong>
+          </p>
+        )}
+      </header>
+        
+      <div className="flex gap-4 items-center">
+        <Input placeholder="Type a city.." onChange={handleInputChange} value={searchCity ?? ""}></Input>
+        <div className="flex items-center space-x-2">
+        <Label htmlFor="imperial">
+            {isImperial ? "Imperial" : "Metric"}
+          </Label>
+          <Switch
+            id="imperial"
+            checked={isImperial}
+            onCheckedChange={handleSwitchChange} // Update the state when switch is toggled
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <Button onClick={fetch} disabled={loading || !searchCity}>
+          {loading ? "Loading..." : "Search"}
+        </Button>
+      </div>
+      
+      <div className="w-full overflow-x-auto max-w-4xl">
+        <Table>
+          <TableHeader>
+          {!loading && weather && (
+            <TableRow>
+              <TableHead>City</TableHead>
+              <TableHead>Temperature</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Humidity</TableHead>
+              <TableHead>Wind Speed</TableHead>
+            </TableRow>
+            )}
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell>
+                  <Skeleton className="w-20 h-4" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="w-24 h-4" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="w-32 h-4" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="w-20 h-4" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="w-24 h-4" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              weather && (
+                <TableRow>
+                  <TableCell>{weather.city}</TableCell>
+                  <TableCell>{weather.temp}</TableCell>
+                  <TableCell className="capitalize">{weather.description}</TableCell>
+                  <TableCell>{weather.humidity}</TableCell>
+                  <TableCell>{weather.windSpeed}</TableCell>
+                </TableRow>
+              )
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
-  );
+  )
 }
