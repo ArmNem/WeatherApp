@@ -3,6 +3,5 @@ export type Weather = {
     temp: string
     description: string
     humidity: string
-    windSpeed: number
+    windSpeed: string
 }
-    
