@@ -10,4 +10,4 @@ To install packages you might need to run npm i.
 
 I used shadcn component library.
 
-Then the project should run with the command npm run dev.
+To run the project you should use the npm run dev command.
