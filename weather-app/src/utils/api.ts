@@ -9,7 +9,8 @@ api.interceptors.request.use((config) => {
     config.params = {
       ...config.params,
       appid: process.env.NEXT_PUBLIC_API_KEY,
-      exclude: 'hourly,daily'
+      exclude: 'hourly,daily',
+      
     }
     return config
   })
